@@ -1,0 +1,40 @@
+html {
+    height: 100%;
+}
+body {
+  font: 36px "ABeeZee", Futura, sans-serif;
+  background-image: linear-gradient(to bottom, rgb(199, 107, 241), rgb(111, 37, 146));
+  background-repeat: no-repeat;
+  background-size: auto;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+
+div.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    text-align: center;
+}
+
+div.app {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 50px;
+}
+
+div.app button {
+  background-color: #2d49c7;
+  border: none;
+  color: white;
+  margin-top: 20px;
+  padding: 80px 80px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 72px;
+}

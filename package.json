@@ -1,0 +1,30 @@
+{
+  "name": "havenspace",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "clean": "rimraf dist",
+    "dev": "npm run clean && parcel --port 8080",
+    "build": "parcel build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Will-Bohlen/havenspace.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Will-Bohlen/havenspace/issues"
+  },
+  "homepage": "https://github.com/Will-Bohlen/havenspace#readme",
+  "dependencies": {
+    "tone": "^14.7.77",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.2",
+    "parcel": "^2.8.3",
+    "rimraf": "^5.0.0"
+  },
+  "source": "src/index.html"
+}
