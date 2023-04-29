@@ -12,7 +12,6 @@ const button = window.document.getElementById("main-button") as HTMLButtonElemen
 var isPressed = false;
 var isMousePress = false;
 var isKeyPress = false;
-var isHovered = false;
 
 song.init();
 
@@ -50,6 +49,7 @@ function buttonReleased () {
         isPressed = false;
         song.advance(false);
 
+        button.style["backgroundColor"] = btnUnpressedColor;
         document.body.style.backgroundImage = "linear-gradient(to bottom, "+color1+", "+color2+")";
     }
 }
