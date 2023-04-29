@@ -562,8 +562,7 @@ const color1 = "#c76bf1";
 const color2 = "#6f2592";
 const color3 = "#f74366";
 const color4 = "#94283d";
-const btnUnhoverColor = "#2d49c7";
-const btnHoverColor = "#0024c2";
+const btnUnpressedColor = "#2d49c7";
 const btnPressedColor = "#fa5519";
 const button = window.document.getElementById("main-button");
 var isPressed = false;
@@ -571,11 +570,11 @@ var isMousePress = false;
 var isKeyPress = false;
 var isHovered = false;
 _song.init();
-button.addEventListener("mousedown", (event)=>{
+document.addEventListener("mousedown", (event)=>{
     isMousePress = true;
     buttonPressed();
 });
-button.addEventListener("mouseup", (event)=>{
+document.addEventListener("mouseup", (event)=>{
     isMousePress = true;
     buttonReleased();
 });
@@ -586,15 +585,6 @@ document.addEventListener("keydown", (event)=>{
 document.addEventListener("keyup", (event)=>{
     isKeyPress = false;
     buttonReleased();
-});
-button.addEventListener("mouseenter", (event)=>{
-    isHovered = true;
-    if (!isKeyPress) button.style["backgroundColor"] = btnHoverColor;
-});
-button.addEventListener("mouseleave", (event)=>{
-    isHovered = false;
-    if (!isKeyPress) button.style["backgroundColor"] = btnUnhoverColor;
-    if (isPressed) buttonReleased();
 });
 function buttonPressed() {
     if (!isPressed) {
@@ -608,38 +598,70 @@ function buttonReleased() {
     if (isPressed) {
         isPressed = false;
         _song.advance(false);
-        button.style["backgroundColor"] = isHovered ? btnHoverColor : btnUnhoverColor;
         document.body.style.backgroundImage = "linear-gradient(to bottom, " + color1 + ", " + color2 + ")";
     }
 }
+function updateLoop() {
+    window.requestAnimationFrame(()=>{
+        _song.tick();
+        updateLoop();
+    });
+}
+updateLoop();
 
 },{"./song":"27NrZ"}],"27NrZ":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "init", ()=>init);
+parcelHelpers.export(exports, "tick", ()=>tick);
 parcelHelpers.export(exports, "advance", ()=>advance);
 var _tone = require("tone");
 let stage = 0;
 let pressedPlayer;
 let unpressedPlayer;
+let startTime;
+let currentTime;
+let sectionStartTime;
+let crossfadeTime;
+let tickFunction = ()=>{};
+const crossFade = new _tone.CrossFade().toDestination();
 function init() {
-    pressedPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/pressed.wav").toDestination();
+    pressedPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/pressed.wav");
     pressedPlayer.loop = true;
-    unpressedPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/unpressed.wav").toDestination();
+    unpressedPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/unpressed.wav");
     unpressedPlayer.loop = true;
+    startTime = new Date().getTime();
+}
+function tick() {
+    currentTime = new Date().getTime();
+    tickFunction();
 }
 function advance(pressed) {
     switch(stage){
         case 0:
             _tone.Transport.start();
-            pressedPlayer.start();
             unpressedPlayer.start();
-            unpressedPlayer.mute = true;
+            pressedPlayer.start();
+            unpressedPlayer.connect(crossFade.a);
+            pressedPlayer.connect(crossFade.b);
+            //unpressedPlayer.mute = true;
             stage++;
+            advance(pressed);
             break;
         case 1:
-            pressedPlayer.mute = !pressed;
-            unpressedPlayer.mute = pressed;
+            let distance = pressed ? 1 - crossFade.fade.value : crossFade.fade.value;
+            crossfadeTime = currentTime + 2000 * distance;
+            tickFunction = ()=>{
+                if (crossfadeTime >= currentTime) {
+                    let cfValue = (crossfadeTime - currentTime) / 2000;
+                    if (pressed) cfValue = 1 - cfValue;
+                    console.log(cfValue);
+                    crossFade.fade.value = cfValue;
+                    console.log(crossFade.fade.value);
+                }
+                if (crossfadeTime < currentTime) crossFade.fade.value = pressed ? 1 : 0;
+            };
+            tickFunction();
             break;
     }
 }
