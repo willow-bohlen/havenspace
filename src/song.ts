@@ -92,7 +92,7 @@ export function advance(pressed: boolean) {
             if (pressed) {
                 chordPlayer.mute = false;
 
-                chordPlayer.setLoopPoints(chordTimings[currentChord], chordTimings[currentChord] + 3.95);
+                chordPlayer.setLoopPoints(chordTimings[currentChord], chordTimings[currentChord] + 2);
                 chordPlayer.seek(chordTimings[currentChord]);
 
                 currentChord = (currentChord + 1) % (chordTimings.length);
