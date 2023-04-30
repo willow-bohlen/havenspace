@@ -616,7 +616,7 @@ parcelHelpers.export(exports, "init", ()=>init);
 parcelHelpers.export(exports, "tick", ()=>tick);
 parcelHelpers.export(exports, "advance", ()=>advance);
 var _tone = require("tone");
-let stage = 10;
+let stage = 0;
 let isPressed = false;
 let chordPlayer;
 let dronePlayer;
@@ -636,38 +636,14 @@ let currentTime;
 let sectionStartTime;
 let currentChord = 0;
 const chordTimings = [
-    [
-        0,
-        1
-    ],
-    [
-        4,
-        5
-    ],
-    [
-        8,
-        9
-    ],
-    [
-        12,
-        13
-    ],
-    [
-        16,
-        17
-    ],
-    [
-        20,
-        21
-    ],
-    [
-        24,
-        25
-    ],
-    [
-        28,
-        29
-    ]
+    0,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    28
 ];
 let crossfadeTime;
 let playingBeat = false;
@@ -720,8 +696,8 @@ function advance(pressed) {
         case 1:
             if (pressed) {
                 chordPlayer.mute = false;
-                chordPlayer.setLoopPoints(chordTimings[currentChord][0], chordTimings[currentChord][1]);
-                chordPlayer.seek(chordTimings[currentChord][0]);
+                chordPlayer.setLoopPoints(chordTimings[currentChord], chordTimings[currentChord] + 3.95);
+                chordPlayer.seek(chordTimings[currentChord]);
                 currentChord = (currentChord + 1) % chordTimings.length;
             } else chordPlayer.mute = true;
             break;
@@ -801,15 +777,15 @@ function advance(pressed) {
                     crossFade.fade.value = cfValue;
                 }
                 if (crossfadeTime < currentTime) crossFade.fade.value = pressed ? 1 : 0;
-                if (currentTime - sectionStartTime > 45000 && !playingBeat) {
+                if (currentTime - sectionStartTime > 54858 && !playingBeat) {
                     transBeatPlayer.volume = -100;
                     transBeatPlayer.start();
                     playingBeat = true;
-                    havenPlayer.volume.exponentialRampTo(-100, 15);
-                    spacePlayer.volume.exponentialRampTo(-100, 15);
-                    transBeatPlayer.volume.exponentialRampTo(0, 15);
+                    havenPlayer.volume.linearRampTo(-100, 15);
+                    spacePlayer.volume.linearRampTo(-100, 15);
+                    transBeatPlayer.volume.linearRampTo(0, 15);
                 }
-                if (currentTime - sectionStartTime > 60000) {
+                if (currentTime - sectionStartTime > 70858) {
                     tickFunction = ()=>{};
                     nextStage();
                 }
