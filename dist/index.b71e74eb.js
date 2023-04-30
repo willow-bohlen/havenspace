@@ -617,10 +617,17 @@ parcelHelpers.export(exports, "tick", ()=>tick);
 parcelHelpers.export(exports, "advance", ()=>advance);
 var _tone = require("tone");
 let stage = 0;
+let isPressed = false;
 let chordPlayer;
 let dronePlayer;
-let pressedPlayer;
-let unpressedPlayer;
+let transDronePlayer;
+let transFluffPlayer;
+let transFuzzPlayer;
+let fuzzworldPlayer;
+let fluffworldPlayer;
+let jamiversePlayer;
+let havenPlayer;
+let spacePlayer;
 let startTime;
 let currentTime;
 let sectionStartTime;
@@ -675,67 +682,139 @@ function init() {
     chordPlayer.loop = true;
     dronePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
     dronePlayer.loop = true;
-    pressedPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/haven.wav");
-    pressedPlayer.loop = true;
-    unpressedPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/space.wav");
-    unpressedPlayer.loop = true;
+    dronePlayer.mute = true;
+    transDronePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
+    transFluffPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
+    transFluffPlayer.mute = true;
+    transFuzzPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfuzz.wav").toDestination();
+    transFuzzPlayer.mute = true;
+    fuzzworldPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/fuzzworld.wav").toDestination();
+    fuzzworldPlayer.loop = true;
+    fuzzworldPlayer.mute = true;
+    fluffworldPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/fluffworld.wav").toDestination();
+    fluffworldPlayer.loop = true;
+    jamiversePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/jamiverse.wav").toDestination();
+    havenPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/haven.wav");
+    havenPlayer.loop = true;
+    spacePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/space.wav");
+    spacePlayer.loop = true;
     startTime = new Date().getTime();
+    _tone.Transport.start();
 }
 function tick() {
     currentTime = new Date().getTime();
     tickFunction();
 }
 function advance(pressed) {
+    isPressed = pressed;
     switch(stage){
         case 0:
-            _tone.Transport.start();
-            //chordPlayer.start()
-            //unpressedPlayer.start();
-            //pressedPlayer.start();
-            //unpressedPlayer.connect(crossFade.a);
-            //pressedPlayer.connect(crossFade.b);
-            //crossFade.fade.value = 1;
-            //unpressedPlayer.mute = true;
-            stage++;
-            advance(pressed);
-            sectionStartTime = currentTime;
+            dronePlayer.start();
+            chordPlayer.start();
+            nextStage();
             break;
         case 1:
-            if (currentTime - sectionStartTime > 40000) {
-                stage++;
-                advance(pressed);
+            if (currentTime - sectionStartTime > 42000) {
+                nextStage();
                 break;
             }
             if (pressed) {
-                dronePlayer.stop();
+                dronePlayer.mute = true;
+                chordPlayer.mute = false;
                 chordPlayer.setLoopPoints(chordTimings[currentChord][1], chordTimings[currentChord][2]);
-                chordPlayer.start("+0", chordTimings[currentChord][0]);
+                chordPlayer.seek(chordTimings[currentChord][0]);
                 currentChord = (currentChord + 1) % chordTimings.length;
-                console.log(currentChord);
             } else {
-                chordPlayer.stop();
-                dronePlayer.start();
+                chordPlayer.mute = true;
+                dronePlayer.mute = false;
             }
             break;
         case 2:
-            if (pressed) dronePlayer.stop();
-            else chordPlayer.stop();
-        case 10:
+            chordPlayer.stop();
+            dronePlayer.stop();
+            transDronePlayer.start();
+            transFluffPlayer.start();
+            transFuzzPlayer.start();
+            tickFunction = ()=>{
+                if (currentTime - sectionStartTime > 40000) {
+                    tickFunction = ()=>{};
+                    nextStage();
+                }
+            };
+            nextStage();
+            break;
+        case 3:
+            transFuzzPlayer.mute = pressed;
+            transFluffPlayer.mute = !pressed;
+            break;
+        case 4:
+            transDronePlayer.stop();
+            transFuzzPlayer.stop();
+            transFluffPlayer.stop();
+            fuzzworldPlayer.start();
+            fluffworldPlayer.start();
+            tickFunction = ()=>{
+                if (currentTime - sectionStartTime > 41036) {
+                    tickFunction = ()=>{};
+                    nextStage();
+                }
+            };
+            nextStage();
+            break;
+        case 5:
+            fuzzworldPlayer.mute = !pressed;
+            fluffworldPlayer.mute = pressed;
+            break;
+        case 6:
+            fuzzworldPlayer.stop();
+            fluffworldPlayer.stop();
+            jamiversePlayer.start();
+            tickFunction = ()=>{
+                if (currentTime - sectionStartTime > 67197) {
+                    tickFunction = ()=>{};
+                    nextStage();
+                }
+            };
+            nextStage();
+            break;
+        case 7:
+            if (pressed) {
+                jamiversePlayer.loop = true;
+                jamiversePlayer.setLoopPoints(Math.max(currentTime - sectionStartTime - 100, 0) / 1000, Math.max(currentTime - sectionStartTime, 100) / 1000);
+            } else {
+                jamiversePlayer.loop = false;
+                jamiversePlayer.restart("+0", (currentTime - sectionStartTime) / 1000);
+            }
+            break;
+        case 8:
+            jamiversePlayer.stop();
+            havenPlayer.start();
+            spacePlayer.start();
+            havenPlayer.connect(crossFade.b);
+            spacePlayer.connect(crossFade.a);
+            crossFade.fade.value = pressed ? 1 : 0;
+            nextStage();
+            break;
+        case 9:
             let distance = pressed ? 0 : crossFade.fade.value; // instant on press, fade on unpress
             crossfadeTime = currentTime + 3000 * distance;
             tickFunction = ()=>{
                 if (crossfadeTime >= currentTime) {
                     let cfValue = (crossfadeTime - currentTime) / 3000;
                     if (pressed) cfValue = 1 - cfValue;
-                    console.log(cfValue);
                     crossFade.fade.value = cfValue;
-                    console.log(crossFade.fade.value);
                 }
                 if (crossfadeTime < currentTime) crossFade.fade.value = pressed ? 1 : 0;
             };
             tickFunction();
             break;
     }
+}
+function nextStage() {
+    stage++;
+    sectionStartTime = currentTime;
+    console.log("Stage: " + stage);
+    advance(isPressed);
 }
 
 },{"tone":"2tCfN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2tCfN":[function(require,module,exports) {
