@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 
-let stage = 9;
+let stage = 0;
 let isPressed = false;
 let chordPlayer;
 let dronePlayer;
@@ -35,7 +35,6 @@ export function init() {
     chordPlayer.loop = true;
     dronePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
     dronePlayer.loop = true;
-    dronePlayer.mute = true;
 
 
     transDronePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();

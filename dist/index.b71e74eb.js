@@ -616,7 +616,7 @@ parcelHelpers.export(exports, "init", ()=>init);
 parcelHelpers.export(exports, "tick", ()=>tick);
 parcelHelpers.export(exports, "advance", ()=>advance);
 var _tone = require("tone");
-let stage = 9;
+let stage = 0;
 let isPressed = false;
 let chordPlayer;
 let dronePlayer;
@@ -686,7 +686,6 @@ function init() {
     chordPlayer.loop = true;
     dronePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
     dronePlayer.loop = true;
-    dronePlayer.mute = true;
     transDronePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
     transFluffPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
     transFluffPlayer.mute = true;
