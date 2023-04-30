@@ -711,23 +711,21 @@ function advance(pressed) {
         case 0:
             dronePlayer.start();
             chordPlayer.start();
+            tickFunction = ()=>{
+                if (currentTime - sectionStartTime > 42000) {
+                    tickFunction = ()=>{};
+                    nextStage();
+                }
+            };
             nextStage();
             break;
         case 1:
-            if (currentTime - sectionStartTime > 42000) {
-                nextStage();
-                break;
-            }
             if (pressed) {
-                dronePlayer.mute = true;
                 chordPlayer.mute = false;
                 chordPlayer.setLoopPoints(chordTimings[currentChord][1], chordTimings[currentChord][2]);
                 chordPlayer.seek(chordTimings[currentChord][0]);
                 currentChord = (currentChord + 1) % chordTimings.length;
-            } else {
-                chordPlayer.mute = true;
-                dronePlayer.mute = false;
-            }
+            } else chordPlayer.mute = true;
             break;
         case 2:
             chordPlayer.stop();
