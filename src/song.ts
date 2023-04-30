@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 
-let stage = 10;
+let stage = 0;
 let isPressed = false;
 let chordPlayer;
 let dronePlayer;
