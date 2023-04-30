@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 
-let stage = 0;
+let stage = 10;
 let isPressed = false;
 let chordPlayer;
 let dronePlayer;
@@ -22,7 +22,7 @@ let currentTime;
 let sectionStartTime;
 
 let currentChord = 0;
-const chordTimings = [[0, 0, 4], [4, 4, 8], [8, 8, 12], [12, 12, 16], [16, 16, 20], [20, 20, 24], [24, 24, 28], [28, 28, 32]];
+const chordTimings = [[0, 1], [4, 5], [8, 9], [12, 13], [16, 17], [20, 21], [24, 25], [28, 29]];
 
 let crossfadeTime;
 let playingBeat = false;
@@ -58,8 +58,8 @@ export function init() {
     spacePlayer.loop = true;
 
     transBeatPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    troughPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    trovePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    troughPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/trough.wav").toDestination();
+    trovePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/trove.wav").toDestination();
 
     startTime = new Date().getTime();
     Tone.Transport.start();
@@ -92,7 +92,7 @@ export function advance(pressed: boolean) {
             if (pressed) {
                 chordPlayer.mute = false;
 
-                chordPlayer.setLoopPoints(chordTimings[currentChord][1], chordTimings[currentChord][2]);
+                chordPlayer.setLoopPoints(chordTimings[currentChord][0], chordTimings[currentChord][1]);
                 chordPlayer.seek(chordTimings[currentChord][0]);
 
                 currentChord = (currentChord + 1) % (chordTimings.length);
@@ -209,7 +209,7 @@ export function advance(pressed: boolean) {
 
                     havenPlayer.volume.exponentialRampTo(-100, 15);
                     spacePlayer.volume.exponentialRampTo(-100, 15);
-                    transBeatPlayer.volume.exponentialRampTo(100, 15);
+                    transBeatPlayer.volume.exponentialRampTo(0, 15);
                 }
 
                 if (currentTime - sectionStartTime > 60000) {
