@@ -616,7 +616,7 @@ parcelHelpers.export(exports, "init", ()=>init);
 parcelHelpers.export(exports, "tick", ()=>tick);
 parcelHelpers.export(exports, "advance", ()=>advance);
 var _tone = require("tone");
-let stage = 0;
+let stage = 9;
 let isPressed = false;
 let chordPlayer;
 let dronePlayer;
@@ -628,6 +628,9 @@ let fluffworldPlayer;
 let jamiversePlayer;
 let havenPlayer;
 let spacePlayer;
+let transBeatPlayer;
+let trovePlayer;
+let troughPlayer;
 let startTime;
 let currentTime;
 let sectionStartTime;
@@ -675,6 +678,7 @@ const chordTimings = [
     ]
 ];
 let crossfadeTime;
+let playingBeat = false;
 let tickFunction = ()=>{};
 const crossFade = new _tone.CrossFade().toDestination();
 function init() {
@@ -698,6 +702,9 @@ function init() {
     havenPlayer.loop = true;
     spacePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/space.wav");
     spacePlayer.loop = true;
+    transBeatPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    troughPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    trovePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
     startTime = new Date().getTime();
     _tone.Transport.start();
 }
@@ -803,9 +810,32 @@ function advance(pressed) {
                     crossFade.fade.value = cfValue;
                 }
                 if (crossfadeTime < currentTime) crossFade.fade.value = pressed ? 1 : 0;
+                if (currentTime - sectionStartTime > 45000 && !playingBeat) {
+                    transBeatPlayer.volume = -100;
+                    transBeatPlayer.start();
+                    playingBeat = true;
+                    havenPlayer.volume.exponentialRampTo(-100, 15);
+                    spacePlayer.volume.exponentialRampTo(-100, 15);
+                    transBeatPlayer.volume.exponentialRampTo(100, 15);
+                }
+                if (currentTime - sectionStartTime > 60000) {
+                    tickFunction = ()=>{};
+                    nextStage();
+                }
             };
             tickFunction();
             break;
+        case 10:
+            havenPlayer.stop();
+            spacePlayer.stop();
+            transBeatPlayer.stop();
+            trovePlayer.start();
+            troughPlayer.start();
+            nextStage();
+            break;
+        case 11:
+            troughPlayer.mute = pressed;
+            trovePlayer.mute = !pressed;
     }
 }
 function nextStage() {
