@@ -11,6 +11,24 @@ body {
   padding: 0 10px;
 }
 
+div.load {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    text-align: center;
+}
+
+div.load h1 {
+    color: #fff;
+    text-align: center;
+    position: absolute;
+    display: inline-block;
+    top: 50%;
+    transform: translateY(-90%);
+}
+
 div.main {
     display: flex;
     flex-direction: column;
@@ -28,13 +46,14 @@ div.app {
 }
 
 div.app button {
-  background-color: #2d49c7;
-  border: none;
-  color: white;
-  margin-top: 20px;
-  padding: 80px 80px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 72px;
+    background-color: #2d49c7;
+    border: none;
+    color: white;
+    opacity: 0;
+    margin-top: 20px;
+    padding: 80px 80px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 72px;
 }

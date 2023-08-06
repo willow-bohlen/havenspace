@@ -2,6 +2,7 @@ import * as Tone from 'tone';
 
 let stage = 0;
 let isPressed = false;
+
 let chordPlayer;
 let dronePlayer;
 let transDronePlayer;
@@ -16,7 +17,6 @@ let transBeatPlayer;
 let trovePlayer;
 let troughPlayer;
 
-
 let startTime;
 let currentTime;
 let sectionStartTime;
@@ -26,43 +26,55 @@ const chordTimings = [[0, 0, 4], [4, 4, 8], [8, 8, 12], [12, 12, 16], [16, 16, 2
 
 let crossfadeTime;
 let playingBeat = false;
+let initComplete = false;
 
 let tickFunction = () => {}; 
 const crossFade = new Tone.CrossFade().toDestination();
 
 export function init() {
-    chordPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/chords.wav").toDestination();
+    chordPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/chords.wav").toDestination();
     chordPlayer.loop = true;
-    dronePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
+    dronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
     dronePlayer.loop = true;
 
 
-    transDronePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
-    transFluffPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
+    transDronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
+    transFluffPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
     transFluffPlayer.mute = true;
-    transFuzzPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfuzz.wav").toDestination();
+    transFuzzPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfuzz.wav").toDestination();
     transFuzzPlayer.mute = true;
 
 
-    fuzzworldPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/fuzzworld.wav").toDestination();
+    fuzzworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fuzzworld.wav").toDestination();
     fuzzworldPlayer.loop = true;
     fuzzworldPlayer.mute = true;
-    fluffworldPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/fluffworld.wav").toDestination();
+    fluffworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fluffworld.wav").toDestination();
     fluffworldPlayer.loop = true;
 
-    jamiversePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/jamiverse.wav").toDestination();
+    jamiversePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/jamiverse.wav").toDestination();
 
-    havenPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/haven.wav");
+    havenPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/haven.wav");
     havenPlayer.loop = true;
-    spacePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/space.wav");
+    spacePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/space.wav");
     spacePlayer.loop = true;
 
-    transBeatPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    troughPlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    trovePlayer = new Tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    transBeatPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    troughPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trough.wav").toDestination();
+    trovePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trove.wav").toDestination();
 
     startTime = new Date().getTime();
     Tone.Transport.start();
+
+    console.log("Init complete");
+    initComplete = true;
+}
+
+export function isLoaded() {
+    if (!initComplete) return false;
+
+    //We can start as soon as the first two tracks are loaded
+    //The rest will load by the time these two finish playing
+    return (chordPlayer.loaded && dronePlayer.loaded);
 }
 
 export function tick() {
@@ -155,6 +167,7 @@ export function advance(pressed: boolean) {
             jamiversePlayer.start();
             tickFunction = () => {
                 if (currentTime - sectionStartTime > 67197) {
+                    jamiversePlayer.stop();
                     tickFunction = () => {};
                     nextStage();
                 }  
@@ -175,8 +188,6 @@ export function advance(pressed: boolean) {
             break;
 
         case 8:
-            jamiversePlayer.stop();
-
             havenPlayer.start();
             spacePlayer.start();
             havenPlayer.connect(crossFade.b);
@@ -191,7 +202,6 @@ export function advance(pressed: boolean) {
             let distance = (pressed ? 0 : crossFade.fade.value); // instant on press, fade on unpress
             crossfadeTime = currentTime + (3000 * distance);
 
-
             tickFunction = () => {
                 if (crossfadeTime >= currentTime) {
                     let cfValue = (crossfadeTime - currentTime) / 3000;
@@ -202,14 +212,14 @@ export function advance(pressed: boolean) {
                     crossFade.fade.value = pressed ? 1 : 0;
                 }
 
-                if (currentTime - sectionStartTime > 45000 && !playingBeat) {
-                    transBeatPlayer.volume = -100;
+                if (currentTime - sectionStartTime > 44000 && !playingBeat) {
+                    transBeatPlayer.volume.value = -40;
                     transBeatPlayer.start();
                     playingBeat = true;
 
-                    havenPlayer.volume.exponentialRampTo(-100, 15);
-                    spacePlayer.volume.exponentialRampTo(-100, 15);
-                    transBeatPlayer.volume.exponentialRampTo(100, 15);
+                    havenPlayer.volume.linearRampTo(-40, 15);
+                    spacePlayer.volume.linearRampTo(-40, 15);
+                    transBeatPlayer.volume.linearRampTo(0, 15);
                 }
 
                 if (currentTime - sectionStartTime > 60000) {

@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Will-Bohlen/havenspace.git"
+    "url": "git+https://github.com/willow-bohlen/havenspace.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Will-Bohlen/havenspace/issues"
+    "url": "https://github.com/willow-bohlen/havenspace/issues"
   },
-  "homepage": "https://github.com/Will-Bohlen/havenspace#readme",
+  "homepage": "https://github.com/willow-bohlen/havenspace#readme",
   "dependencies": {
     "tone": "^14.7.77",
     "typescript": "^5.0.4"

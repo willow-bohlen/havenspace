@@ -12,6 +12,23 @@ body {
   font: 36px ABeeZee, Futura, sans-serif;
 }
 
+div.load {
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+div.load h1 {
+  color: #fff;
+  text-align: center;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-90%);
+}
+
 div.main {
   text-align: center;
   flex-direction: column;
@@ -29,6 +46,7 @@ div.app {
 
 div.app button {
   color: #fff;
+  opacity: 0;
   text-align: center;
   background-color: #2d49c7;
   border: none;

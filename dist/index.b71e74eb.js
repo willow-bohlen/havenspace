@@ -565,9 +565,11 @@ const color4 = "#94283d";
 const btnUnpressedColor = "#2d49c7";
 const btnPressedColor = "#fa5519";
 const button = window.document.getElementById("main-button");
+const loadText = window.document.getElementById("loadText");
 var isPressed = false;
 var isMousePress = false;
 var isKeyPress = false;
+var isLoaded = false;
 _song.init();
 document.addEventListener("mousedown", (event)=>{
     isMousePress = true;
@@ -586,7 +588,7 @@ document.addEventListener("keyup", (event)=>{
     buttonReleased();
 });
 function buttonPressed() {
-    if (!isPressed) {
+    if (!isPressed && isLoaded) {
         isPressed = true;
         _song.advance(true);
         button.style["backgroundColor"] = btnPressedColor;
@@ -594,16 +596,45 @@ function buttonPressed() {
     }
 }
 function buttonReleased() {
-    if (isPressed) {
+    if (isPressed && isLoaded) {
         isPressed = false;
         _song.advance(false);
         button.style["backgroundColor"] = btnUnpressedColor;
         document.body.style.backgroundImage = "linear-gradient(to bottom, " + color1 + ", " + color2 + ")";
     }
 }
+function fadeIn(element) {
+    var op = 0.1; // initial opacity
+    element.style.display = "block";
+    var timer = setInterval(function() {
+        if (op >= 1) clearInterval(timer);
+        element.style.opacity = op;
+        element.style.filter = "alpha(opacity=" + op * 100 + ")";
+        op += op * 0.05;
+    }, 10);
+}
+function fadeOut(element) {
+    var op = 1; // initial opacity
+    element.style.display = "block";
+    var timer = setInterval(function() {
+        if (op <= 0) {
+            clearInterval(timer);
+            fadeIn(button);
+        }
+        element.style.opacity = op;
+        element.style.filter = "alpha(opacity=" + op * 100 + ")";
+        op -= op * 0.05 + 0.01;
+    }, 10);
+}
 function updateLoop() {
     window.requestAnimationFrame(()=>{
-        _song.tick();
+        if (!isLoaded) {
+            isLoaded = _song.isLoaded();
+            if (isLoaded) {
+                console.log("Loaded!");
+                fadeOut(loadText);
+            }
+        } else _song.tick();
         updateLoop();
     });
 }
@@ -613,6 +644,7 @@ updateLoop();
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "init", ()=>init);
+parcelHelpers.export(exports, "isLoaded", ()=>isLoaded);
 parcelHelpers.export(exports, "tick", ()=>tick);
 parcelHelpers.export(exports, "advance", ()=>advance);
 var _tone = require("tone");
@@ -679,33 +711,42 @@ const chordTimings = [
 ];
 let crossfadeTime;
 let playingBeat = false;
+let initComplete = false;
 let tickFunction = ()=>{};
 const crossFade = new _tone.CrossFade().toDestination();
 function init() {
-    chordPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/chords.wav").toDestination();
+    chordPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/chords.wav").toDestination();
     chordPlayer.loop = true;
-    dronePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
+    dronePlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
     dronePlayer.loop = true;
-    transDronePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
-    transFluffPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
+    transDronePlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
+    transFluffPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
     transFluffPlayer.mute = true;
-    transFuzzPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionfuzz.wav").toDestination();
+    transFuzzPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfuzz.wav").toDestination();
     transFuzzPlayer.mute = true;
-    fuzzworldPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/fuzzworld.wav").toDestination();
+    fuzzworldPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fuzzworld.wav").toDestination();
     fuzzworldPlayer.loop = true;
     fuzzworldPlayer.mute = true;
-    fluffworldPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/fluffworld.wav").toDestination();
+    fluffworldPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fluffworld.wav").toDestination();
     fluffworldPlayer.loop = true;
-    jamiversePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/jamiverse.wav").toDestination();
-    havenPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/haven.wav");
+    jamiversePlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/jamiverse.wav").toDestination();
+    havenPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/haven.wav");
     havenPlayer.loop = true;
-    spacePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/space.wav");
+    spacePlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/space.wav");
     spacePlayer.loop = true;
-    transBeatPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    troughPlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    trovePlayer = new _tone.Player("https://will-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    transBeatPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
+    troughPlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trough.wav").toDestination();
+    trovePlayer = new _tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trove.wav").toDestination();
     startTime = new Date().getTime();
     _tone.Transport.start();
+    console.log("Init complete");
+    initComplete = true;
+}
+function isLoaded() {
+    if (!initComplete) return false;
+    //We can start as soon as the first two tracks are loaded
+    //The rest will load by the time these two finish playing
+    return chordPlayer.loaded && dronePlayer.loaded;
 }
 function tick() {
     currentTime = new Date().getTime();
@@ -775,6 +816,7 @@ function advance(pressed) {
             jamiversePlayer.start();
             tickFunction = ()=>{
                 if (currentTime - sectionStartTime > 67197) {
+                    jamiversePlayer.stop();
                     tickFunction = ()=>{};
                     nextStage();
                 }
@@ -791,7 +833,6 @@ function advance(pressed) {
             }
             break;
         case 8:
-            jamiversePlayer.stop();
             havenPlayer.start();
             spacePlayer.start();
             havenPlayer.connect(crossFade.b);
@@ -809,13 +850,13 @@ function advance(pressed) {
                     crossFade.fade.value = cfValue;
                 }
                 if (crossfadeTime < currentTime) crossFade.fade.value = pressed ? 1 : 0;
-                if (currentTime - sectionStartTime > 45000 && !playingBeat) {
-                    transBeatPlayer.volume = -100;
+                if (currentTime - sectionStartTime > 44000 && !playingBeat) {
+                    transBeatPlayer.volume.value = -40;
                     transBeatPlayer.start();
                     playingBeat = true;
-                    havenPlayer.volume.exponentialRampTo(-100, 15);
-                    spacePlayer.volume.exponentialRampTo(-100, 15);
-                    transBeatPlayer.volume.exponentialRampTo(100, 15);
+                    havenPlayer.volume.linearRampTo(-40, 15);
+                    spacePlayer.volume.linearRampTo(-40, 15);
+                    transBeatPlayer.volume.linearRampTo(0, 15);
                 }
                 if (currentTime - sectionStartTime > 60000) {
                     tickFunction = ()=>{};

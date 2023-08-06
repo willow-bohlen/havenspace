@@ -8,10 +8,13 @@ const btnUnpressedColor = "#2d49c7";
 const btnPressedColor = "#fa5519";
 
 const button = window.document.getElementById("main-button") as HTMLButtonElement;
+const loadText = window.document.getElementById("loadText") as HTMLHeadingElement;
 
 var isPressed = false;
 var isMousePress = false;
 var isKeyPress = false;
+
+var isLoaded = false;
 
 song.init();
 
@@ -35,7 +38,7 @@ document.addEventListener('keyup', (event) => {
 });
 
 function buttonPressed () {
-    if (!isPressed) {
+    if (!isPressed && isLoaded) {
         isPressed = true;
         song.advance(true);
 
@@ -45,7 +48,7 @@ function buttonPressed () {
 }
 
 function buttonReleased () {
-    if (isPressed) {
+    if (isPressed && isLoaded) {
         isPressed = false;
         song.advance(false);
 
@@ -54,9 +57,45 @@ function buttonReleased () {
     }
 }
 
+function fadeIn(element) {
+    var op = 0.1;  // initial opacity
+    element.style.display = 'block';
+    var timer = setInterval(function () {
+        if (op >= 1){
+            clearInterval(timer);
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op += op * 0.05;
+    }, 10);
+}
+
+function fadeOut(element) {
+    var op = 1;  // initial opacity
+    element.style.display = 'block';
+    var timer = setInterval(function () {
+        if (op <= 0){
+            clearInterval(timer);
+            fadeIn(button);
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op -= op * 0.05 + 0.01;
+    }, 10);
+}
+
 function updateLoop() {
     window.requestAnimationFrame(() => {
-        song.tick();
+        if (!isLoaded) {
+            isLoaded = song.isLoaded();
+            if (isLoaded) {
+                console.log("Loaded!");
+                fadeOut(loadText);
+            }
+        }
+        else {
+            song.tick();
+        }
         updateLoop();
     });
 }
