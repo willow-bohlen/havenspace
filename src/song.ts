@@ -22,7 +22,7 @@ let currentTime;
 let sectionStartTime;
 
 let currentChord = 0;
-const chordTimings = [[0, 0, 4], [4, 4, 8], [8, 8, 12], [12, 12, 16], [16, 16, 20], [20, 20, 24], [24, 24, 28], [28, 28, 32]];
+const chordTimings = [0, 4, 8, 12, 16, 20, 24, 28];
 
 let crossfadeTime;
 let playingBeat = false;
@@ -104,8 +104,8 @@ export function advance(pressed: boolean) {
             if (pressed) {
                 chordPlayer.mute = false;
 
-                chordPlayer.setLoopPoints(chordTimings[currentChord][1], chordTimings[currentChord][2]);
-                chordPlayer.seek(chordTimings[currentChord][0]);
+                chordPlayer.setLoopPoints(chordTimings[currentChord], chordTimings[currentChord] + 2);
+                chordPlayer.seek(chordTimings[currentChord]);
 
                 currentChord = (currentChord + 1) % (chordTimings.length);
             }
@@ -222,7 +222,7 @@ export function advance(pressed: boolean) {
                     transBeatPlayer.volume.linearRampTo(0, 15);
                 }
 
-                if (currentTime - sectionStartTime > 60000) {
+                if (currentTime - sectionStartTime > 70858) {
                     tickFunction = () => {};
                     nextStage();
                 }  
@@ -239,7 +239,7 @@ export function advance(pressed: boolean) {
             trovePlayer.start();
             troughPlayer.start();
 
-            nextStage()
+            nextStage();
             break;
         
         case 11:
@@ -251,6 +251,6 @@ export function advance(pressed: boolean) {
 function nextStage() {
     stage++;
     sectionStartTime = currentTime;
-    console.log("Stage: "+stage)
+    console.log("Stage: "+stage);
     advance(isPressed);
 }
