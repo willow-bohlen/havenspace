@@ -9,23 +9,29 @@ const btnPressedColor = "#fa5519";
 
 const button = window.document.getElementById("main-button") as HTMLButtonElement;
 const loadText = window.document.getElementById("loadText") as HTMLHeadingElement;
+const mobileText = window.document.getElementById("mobileText") as HTMLParagraphElement;
 
 var isPressed = false;
 var isMousePress = false;
 var isKeyPress = false;
+var isTouchPress = false; 
 
 var isLoaded = false;
 
 song.init();
 
 document.addEventListener("mousedown", (event) => {
-    isMousePress = true;
-    buttonPressed();
+    if (!isTouchPress) {
+        isMousePress = true;
+        buttonPressed();
+    }
 })
 
 document.addEventListener("mouseup", (event) => {
-    isMousePress = true;
-    buttonReleased();
+    if (!isTouchPress) {
+        isMousePress = false;
+        buttonReleased();
+    }
 })
 
 document.addEventListener('keydown', (event) => {
@@ -36,6 +42,16 @@ document.addEventListener('keyup', (event) => {
     isKeyPress = false;
     buttonReleased();
 });
+document.addEventListener('touchstart', (event) => {
+    isTouchPress = true;
+    buttonPressed();
+});
+document.addEventListener('touchend', (event) => {
+    isTouchPress = false;
+    buttonReleased();
+});
+
+
 
 function buttonPressed () {
     if (!isPressed && isLoaded) {
@@ -84,6 +100,22 @@ function fadeOut(element) {
     }, 10);
 }
 
+function detectMob() {
+    const toMatch = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+    
+    return toMatch.some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+}
+
 function updateLoop() {
     window.requestAnimationFrame(() => {
         if (!isLoaded) {
@@ -98,6 +130,10 @@ function updateLoop() {
         }
         updateLoop();
     });
+}
+
+if (!detectMob()) {
+    mobileText.remove();
 }
 
 updateLoop();
