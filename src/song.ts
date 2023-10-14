@@ -32,38 +32,37 @@ let tickFunction = () => {};
 const crossFade = new Tone.CrossFade().toDestination();
 
 export function init() {
-    chordPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/chords.wav").toDestination();
+    chordPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/chords.mp3").toDestination();
     chordPlayer.loop = true;
-    dronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/dronebeat.wav").toDestination();
+    dronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/dronebeat.mp3").toDestination();
     dronePlayer.loop = true;
 
 
-    transDronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitiondrone.wav").toDestination();
-    transFluffPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfluff.wav").toDestination();
+    transDronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitiondrone.mp3").toDestination();
+    transFluffPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfluff.mp3").toDestination();
     transFluffPlayer.mute = true;
-    transFuzzPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfuzz.wav").toDestination();
+    transFuzzPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfuzz.mp3").toDestination();
     transFuzzPlayer.mute = true;
 
 
-    fuzzworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fuzzworld.wav").toDestination();
+    fuzzworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fuzzworld.mp3").toDestination();
     fuzzworldPlayer.loop = true;
     fuzzworldPlayer.mute = true;
-    fluffworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fluffworld.wav").toDestination();
+    fluffworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fluffworld.mp3").toDestination();
     fluffworldPlayer.loop = true;
 
-    jamiversePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/jamiverse.wav").toDestination();
+    jamiversePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/jamiverse.mp3").toDestination();
 
-    havenPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/haven.wav");
+    havenPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/haven.mp3");
     havenPlayer.loop = true;
-    spacePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/space.wav");
+    spacePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/space.mp3");
     spacePlayer.loop = true;
 
-    transBeatPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionbeat.wav").toDestination();
-    troughPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trough.wav").toDestination();
-    trovePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trove.wav").toDestination();
+    transBeatPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionbeat.mp3").toDestination();
+    troughPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trough.mp3").toDestination();
+    trovePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trove.mp3").toDestination();
 
     startTime = new Date().getTime();
-    Tone.Transport.start();
 
     console.log("Init complete");
     initComplete = true;
@@ -86,6 +85,7 @@ export function advance(pressed: boolean) {
     isPressed = pressed;
     switch (stage) {
         case 0:
+            Tone.Transport.start();
             dronePlayer.start();
             chordPlayer.start();
 
