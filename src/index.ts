@@ -16,12 +16,9 @@ var isMousePress = false;
 var isKeyPress = false;
 var isTouchPress = false; 
 
-var isMobileTextShown = false;
-
 var isLoaded = false;
 
 song.init();
-mobileText.style.opacity = "0.0";
 
 document.addEventListener("mousedown", (event) => {
     if (!isTouchPress) {
@@ -48,10 +45,6 @@ document.addEventListener('keyup', (event) => {
 document.addEventListener('touchstart', (event) => {
     isTouchPress = true;
     buttonPressed();
-
-    if (!isMobileTextShown) {
-        fadeIn(mobileText)
-    }
 });
 document.addEventListener('touchend', (event) => {
     isTouchPress = false;
@@ -107,6 +100,22 @@ function fadeOut(element) {
     }, 10);
 }
 
+function detectMob() {
+    const toMatch = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+    
+    return toMatch.some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+}
+
 function updateLoop() {
     window.requestAnimationFrame(() => {
         if (!isLoaded) {
@@ -121,6 +130,10 @@ function updateLoop() {
         }
         updateLoop();
     });
+}
+
+if (!detectMob()) {
+    mobileText.remove();
 }
 
 updateLoop();
