@@ -19,6 +19,7 @@ let troughPlayer;
 
 let startTime;
 let currentTime;
+let delta;
 let sectionStartTime;
 
 let currentChord = 0;
@@ -31,38 +32,41 @@ let initComplete = false;
 let tickFunction = () => {}; 
 const crossFade = new Tone.CrossFade().toDestination();
 
+const baseUrl = "https://willowbohlen.com/havenspace/src/audio/";
+
 export function init() {
-    chordPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/chords.mp3").toDestination();
+    chordPlayer = new Tone.Player(baseUrl + "chords.mp3").toDestination();
     chordPlayer.loop = true;
-    dronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/dronebeat.mp3").toDestination();
+    dronePlayer = new Tone.Player(baseUrl + "dronebeat.mp3").toDestination();
     dronePlayer.loop = true;
 
 
-    transDronePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitiondrone.mp3").toDestination();
-    transFluffPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfluff.mp3").toDestination();
+    transDronePlayer = new Tone.Player(baseUrl + "transitiondrone.mp3").toDestination();
+    transFluffPlayer = new Tone.Player(baseUrl + "transitionfluff.mp3").toDestination();
     transFluffPlayer.mute = true;
-    transFuzzPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionfuzz.mp3").toDestination();
+    transFuzzPlayer = new Tone.Player(baseUrl + "transitionfuzz.mp3").toDestination();
     transFuzzPlayer.mute = true;
 
 
-    fuzzworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fuzzworld.mp3").toDestination();
+    fuzzworldPlayer = new Tone.Player(baseUrl + "fuzzworld.mp3").toDestination();
     fuzzworldPlayer.loop = true;
     fuzzworldPlayer.mute = true;
-    fluffworldPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/fluffworld.mp3").toDestination();
+    fluffworldPlayer = new Tone.Player(baseUrl + "fluffworld.mp3").toDestination();
     fluffworldPlayer.loop = true;
 
-    jamiversePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/jamiverse.mp3").toDestination();
+    jamiversePlayer = new Tone.Player(baseUrl + "jamiverse.mp3").toDestination();
 
-    havenPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/haven.mp3");
+    havenPlayer = new Tone.Player(baseUrl + "haven.mp3");
     havenPlayer.loop = true;
-    spacePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/space.mp3");
+    spacePlayer = new Tone.Player(baseUrl + "space.mp3");
     spacePlayer.loop = true;
 
-    transBeatPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/transitionbeat.mp3").toDestination();
-    troughPlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trough.mp3").toDestination();
-    trovePlayer = new Tone.Player("https://willow-bohlen.github.io/havenspace/src/audio/trove.mp3").toDestination();
+    transBeatPlayer = new Tone.Player(baseUrl + "transitionbeat.mp3").toDestination();
+    troughPlayer = new Tone.Player(baseUrl + "trough.mp3").toDestination();
+    trovePlayer = new Tone.Player(baseUrl + "trove.mp3").toDestination();
 
     startTime = new Date().getTime();
+    currentTime = startTime;
 
     console.log("Init complete");
     initComplete = true;
@@ -77,7 +81,9 @@ export function isLoaded() {
 }
 
 export function tick() {
+    let lastTick = currentTime
     currentTime = new Date().getTime();
+    delta = currentTime - lastTick
     tickFunction();
 }
 
@@ -91,7 +97,8 @@ export function advance(pressed: boolean) {
 
 
             tickFunction = () => {
-                if (currentTime - sectionStartTime > 42000) {
+                if (currentTime - sectionStartTime > sampleLength(dronePlayer) * 2 - delta) {
+                    console.log(currentTime - sectionStartTime)
                     tickFunction = () => {};
                     nextStage();
                 }  
@@ -121,9 +128,9 @@ export function advance(pressed: boolean) {
             transDronePlayer.start();
             transFluffPlayer.start();
             transFuzzPlayer.start();
-    
+
             tickFunction = () => {
-                if (currentTime - sectionStartTime > 40000) {
+                if (currentTime - sectionStartTime > sampleLength(transDronePlayer) - delta) {
                     tickFunction = () => {};
                     nextStage();
                 }  
@@ -146,7 +153,7 @@ export function advance(pressed: boolean) {
             fluffworldPlayer.start();
 
             tickFunction = () => {
-                if (currentTime - sectionStartTime > 41036) {
+                if (currentTime - sectionStartTime > sampleLength(fuzzworldPlayer) - delta) {
                     tickFunction = () => {};
                     nextStage();
                 }  
@@ -166,7 +173,7 @@ export function advance(pressed: boolean) {
 
             jamiversePlayer.start();
             tickFunction = () => {
-                if (currentTime - sectionStartTime > 67197) {
+                if (currentTime - sectionStartTime > sampleLength(jamiversePlayer) - delta && !isPressed) {
                     jamiversePlayer.stop();
                     tickFunction = () => {};
                     nextStage();
@@ -179,7 +186,7 @@ export function advance(pressed: boolean) {
         case 7:
             if (pressed) {
                 jamiversePlayer.loop = true;
-                jamiversePlayer.setLoopPoints(Math.max(currentTime - sectionStartTime - 100, 0) / 1000, Math.max(currentTime - sectionStartTime, 100) / 1000);
+                jamiversePlayer.setLoopPoints(Math.max(currentTime - sectionStartTime - (Math.random() * 200), 0) / 1000, Math.max(currentTime - sectionStartTime, (Math.random() * 200)) / 1000);
             }
             else {
                 jamiversePlayer.loop = false;
@@ -212,7 +219,7 @@ export function advance(pressed: boolean) {
                     crossFade.fade.value = pressed ? 1 : 0;
                 }
 
-                if (currentTime - sectionStartTime > 44000 && !playingBeat) {
+                if (currentTime - sectionStartTime > sampleLength(havenPlayer) - delta && !playingBeat) {
                     transBeatPlayer.volume.value = -40;
                     transBeatPlayer.start();
                     playingBeat = true;
@@ -222,7 +229,7 @@ export function advance(pressed: boolean) {
                     transBeatPlayer.volume.linearRampTo(0, 15);
                 }
 
-                if (currentTime - sectionStartTime > 70858) {
+                if (currentTime - sectionStartTime > sampleLength(havenPlayer) + sampleLength(transBeatPlayer) - delta) {
                     tickFunction = () => {};
                     nextStage();
                 }  
@@ -253,4 +260,8 @@ function nextStage() {
     sectionStartTime = currentTime;
     console.log("Stage: "+stage);
     advance(isPressed);
+}
+
+function sampleLength(player) {
+    return player.buffer.length * player.sampleTime * 1000 
 }

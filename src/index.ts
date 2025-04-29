@@ -117,23 +117,20 @@ function detectMob() {
 }
 
 function updateLoop() {
-    window.requestAnimationFrame(() => {
-        if (!isLoaded) {
-            isLoaded = song.isLoaded();
-            if (isLoaded) {
-                console.log("Loaded!");
-                fadeOut(loadText);
-            }
+    if (!isLoaded) {
+        isLoaded = song.isLoaded();
+        if (isLoaded) {
+            console.log("Loaded!");
+            fadeOut(loadText);
         }
-        else {
-            song.tick();
-        }
-        updateLoop();
-    });
+    }
+    else {
+        song.tick();
+    }
 }
 
 if (!detectMob()) {
     mobileText.remove();
 }
 
-updateLoop();
+setInterval(updateLoop, 15)
