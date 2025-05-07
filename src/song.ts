@@ -186,7 +186,7 @@ export function advance(pressed: boolean) {
         case 7:
             if (pressed) {
                 jamiversePlayer.loop = true;
-                jamiversePlayer.setLoopPoints(Math.max(currentTime - sectionStartTime - (Math.random() * 200), 0) / 1000, Math.max(currentTime - sectionStartTime, (Math.random() * 200)) / 1000);
+                jamiversePlayer.setLoopPoints(Math.max(currentTime - sectionStartTime - (Math.random() * 200), 0) / 1000, Math.max(currentTime - sectionStartTime, 100) / 1000);
             }
             else {
                 jamiversePlayer.loop = false;
